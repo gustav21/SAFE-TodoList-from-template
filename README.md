@@ -1,6 +1,6 @@
-# SAFE Template
+# [SAFE-TodoList](https://github.com/Zaid-Ajaj/SAFE-TodoList) migrated to latest [SAFE Template](https://github.com/SAFE-Stack/SAFE-template)
 
-This template can be used to generate a full-stack web application using the [SAFE Stack](https://safe-stack.github.io/). It was created using the dotnet [SAFE Template](https://safe-stack.github.io/docs/template-overview/). If you want to learn more about the template why not start with the [quick start](https://safe-stack.github.io/docs/quickstart/) guide?
+Original SAFE-TodoList [hangs on "wait until bundle finished"](https://github.com/Zaid-Ajaj/SAFE-TodoList/issues/32) on Windows, so I took SAFE-Template and moved SAFE-TodoList code to it.
 
 ## Install pre-requisites
 
