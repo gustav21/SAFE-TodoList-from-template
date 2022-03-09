@@ -1,4 +1,4 @@
-module Todo.Server 
+module Todo.Server
 
 open Shared
 open Elmish
@@ -9,7 +9,7 @@ open Fable.Remoting.Client
 // Create typed proxy for server api
 // =================================
 
-let api : ITodoProtocol = 
+let api : ITodoProtocol =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ITodoProtocol>
@@ -17,20 +17,20 @@ let api : ITodoProtocol =
 // ===========================================
 // Create Elmish commands that map server calls to client messages,
 // these messages will be propagated into the Elmish dispatch loop,
-// This makes for a clean api when dealing with the State of the app 
+// This makes for a clean api when dealing with the State of the app
 // see the `update` function
 // ==========================================
 
 let loadAllTodos() =
-    Cmd.ofAsync 
+    Cmd.OfAsync.either
       api.allTodos ()
       TodoItemsLoaded
       LoadTodoItemsFailure
 
-let deleteTodo id = 
-    // the server call being successful, 
+let deleteTodo id =
+    // the server call being successful,
     // does not mean that the operation has succeeded.
-    // Map server result to client msg 
+    // Map server result to client msg
     let successCallback = function
         | Deleted -> LoadTodoItems
         | DeleteError error -> DeleteTodoFailure error
@@ -38,30 +38,30 @@ let deleteTodo id =
     // Error callback for other errors that could happen:
     // - Network error
     // - Server exceptions
-    let errorCallback (_: exn) = 
+    let errorCallback (_: exn) =
         DeleteTodoFailure DeleteNotSuccesful
-    
-    Cmd.ofAsync
+
+    Cmd.OfAsync.either
       api.deleteTodo id
       // delete CALL => reload all items
       successCallback
       errorCallback
 
-let addTodo text = 
-    Cmd.ofAsync
+let addTodo text =
+    Cmd.OfAsync.either
       api.addTodo (Description(text))
-      (function 
+      (function
         | Some addedTodo -> TodoAdded addedTodo
         | None -> AddTodoFailed)
       (fun ex -> AddTodoFailed)
 
 
-let toggleCompleted id = 
-    Cmd.ofAsync
+let toggleCompleted id =
+    Cmd.OfAsync.either
       api.toggleCompleted id
       // success callback
-      (function 
+      (function
         | Updated -> LoadTodoItems
         | UpdateError error -> ToggleCompletedFailure error)
       // error callback
-      (fun _ -> ToggleCompletedFailure UpdateNotSuccesful) 
+      (fun _ -> ToggleCompletedFailure UpdateNotSuccesful)
