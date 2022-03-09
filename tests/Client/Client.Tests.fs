@@ -2,26 +2,24 @@ module Client.Tests
 
 open Fable.Mocha
 
-open Index
 open Shared
+open Todo
+open Todo.Types
 
 let client = testList "Client" [
     testCase "Added todo" <| fun _ ->
-        let newTodo = Todo.create "new todo"
-        let model, _ = init ()
+        let newTodo = { defaultTodo() with Description = "new todo" }
+        let model, _ = State.initialState ()
 
-        let model, _ = update (AddedTodo newTodo) model
+        let model, _ = State.update (TodoAdded newTodo) model
 
-        Expect.equal 1 model.Todos.Length "There should be 1 todo"
-        Expect.equal newTodo model.Todos.[0] "Todo should equal new todo"
+        Expect.equal 1 model.TodoItems.Length "There should be 1 todo"
+        Expect.equal newTodo model.TodoItems.[0] "Todo should equal new todo"
 ]
 
 let all =
     testList "All"
         [
-#if FABLE_COMPILER // This preprocessor directive makes editor happy
-            Shared.Tests.shared
-#endif
             client
         ]
 
