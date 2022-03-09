@@ -4,13 +4,13 @@ open Elmish
 open Fable.Remoting.Client
 open Shared
 
-type Model = { Todos: Todo list; Input: string }
+type Model = { Todos: TodoOld list; Input: string }
 
 type Msg =
-    | GotTodos of Todo list
+    | GotTodos of TodoOld list
     | SetInput of string
     | AddTodo
-    | AddedTodo of Todo
+    | AddedTodo of TodoOld
 
 let todosApi =
     Remoting.createApi ()
