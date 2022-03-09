@@ -40,9 +40,11 @@ let todosApi =
               } }
 
 let webApp =
+    let todoProtocol = WebApp.createUsingInMemoryStorage()
+    WebApp.seedIntitialData(todoProtocol)
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.fromValue todosApi
+    |> Remoting.fromValue todoProtocol
     |> Remoting.buildHttpHandler
 
 let app =
