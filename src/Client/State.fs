@@ -24,7 +24,7 @@ let update (msg: Msg) (prevState: State) =
 
     | AddTodo ->
         match prevState.NewTodoDescription with
-        | None -> prevState, Cmd.none
+        | Some "" | None -> prevState, Cmd.none
         | Some text -> prevState, Server.addTodo text
 
     | TodoAdded todoItem ->
