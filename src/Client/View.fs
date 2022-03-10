@@ -41,15 +41,38 @@ let addTodo (state: State) dispatch =
         [ ClassName "control is-large" ]
         [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch AddTodo) ] [ str "Add Todo" ] ] ]
 
+let visibilityCombo dispatch =
+    let parseVisibility value =
+        match Visibility.parse value with
+        | Some visibility -> visibility
+        | None -> Visibility.All
+
+    div
+        [ ClassName "select" ]
+        [ select
+            [ OnChange (fun ev -> dispatch (SetVisibility (parseVisibility !!ev.target?value))) ]
+            [ option [ Value Visibility.All ] [ str "All" ]
+              option [ Value Visibility.Completed ] [ str "Completed" ]
+              option [ Value Visibility.NotCompleted ] [ str "Not completed" ] ] ]
+
 let render  (state: State) dispatch =
     let sortedTodos =
       state.TodoItems
+      |> List.filter (fun todo -> match state.Visibility with
+                                  | Visibility.All -> true
+                                  | Completed -> todo.Completed
+                                  | NotCompleted -> todo.Completed = false)
       |> List.sortBy (fun todo -> todo.DateAdded)
       |> List.map (fun todo -> renderTodo todo dispatch)
+
+    let controls =
+        [visibilityCombo]
+        |> List.map (fun renderControl -> renderControl dispatch)
 
     div
      [ Style [ Padding 20 ] ]
      [ yield h1 [ Style [ FontSize 24 ] ] [ str "SAFE Todo-List" ]
        yield hr [ ]
        yield addTodo state dispatch
+       yield div [ Style [ Padding 5 ] ] controls
        yield! sortedTodos ]

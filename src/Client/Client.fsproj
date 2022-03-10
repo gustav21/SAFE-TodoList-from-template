@@ -8,6 +8,7 @@
         <None Include="index.html" />
         <None Include="paket.references" />
         <Compile Include="Types.fs" />
+        <Compile Include="Utils.fs" />
         <Compile Include="Server.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />
