@@ -1,9 +1,9 @@
 module Todo.State
 
 open Todo.Types
-open Elmish 
+open Elmish
 
-let initialState() = 
+let initialState() =
     let initState = {
         TodoItems = []
         NewTodoDescription = None
@@ -13,13 +13,13 @@ let initialState() =
     initState, Cmd.ofMsg LoadTodoItems
 
 
-let update (msg: Msg) (prevState: State) = 
+let update (msg: Msg) (prevState: State) =
     match msg with
     | SetNewTextDescription text ->
         let nextState = { prevState with NewTodoDescription = Some text }
         nextState, Cmd.none
 
-    | LoadTodoItems -> 
+    | LoadTodoItems ->
         prevState, Server.loadAllTodos()
 
     | AddTodo ->
@@ -27,19 +27,23 @@ let update (msg: Msg) (prevState: State) =
         | None -> prevState, Cmd.none
         | Some text -> prevState, Server.addTodo text
 
-    | TodoAdded todoItem -> 
-        let nextTodoItems = List.append prevState.TodoItems [todoItem] 
+    | TodoAdded todoItem ->
+        let nextTodoItems = List.append prevState.TodoItems [todoItem]
         let nextState = { prevState with TodoItems = nextTodoItems; NewTodoDescription = None }
         nextState, Cmd.none
-            
-    | TodoItemsLoaded items -> 
+
+    | TodoItemsLoaded items ->
         let nextState = { prevState with TodoItems = items }
         nextState, Cmd.none
 
-    | ToggleCompleted id -> 
+    | ToggleCompleted id ->
         prevState, Server.toggleCompleted id
 
     | DeleteTodo id ->
         prevState, Server.deleteTodo id
+
+    | SetVisibility visibility ->
+        let nextState = { prevState with Visibility = visibility }
+        nextState, Cmd.none
 
     | _ -> prevState, Cmd.none
