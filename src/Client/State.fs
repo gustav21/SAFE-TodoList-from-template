@@ -7,6 +7,7 @@ let initialState() =
     let initState = {
         TodoItems = []
         NewTodoDescription = None
+        NewTodoDueDate = None
         Visibility = All
     }
 
@@ -25,7 +26,7 @@ let update (msg: Msg) (prevState: State) =
     | AddTodo ->
         match prevState.NewTodoDescription with
         | Some "" | None -> prevState, Cmd.none
-        | Some text -> prevState, Server.addTodo text
+        | Some text -> prevState, Server.addTodo text prevState.NewTodoDueDate
 
     | TodoAdded todoItem ->
         let nextTodoItems = List.append prevState.TodoItems [todoItem]

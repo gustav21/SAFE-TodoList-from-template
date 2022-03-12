@@ -47,9 +47,9 @@ let deleteTodo id =
       successCallback
       errorCallback
 
-let addTodo text =
+let addTodo text dueDate =
     Cmd.OfAsync.either
-      api.addTodo (Description(text))
+      api.addTodo (Description(text), DueDate(dueDate))
       (function
         | Some addedTodo -> TodoAdded addedTodo
         | None -> AddTodoFailed)

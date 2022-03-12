@@ -3,14 +3,15 @@ module Todo.Types
 open Shared
 open System
 
-type Visibility = 
+type Visibility =
   | All
   | Completed
-  | NotCompleted 
+  | NotCompleted
 
 type State = {
   TodoItems: List<Todo>
-  NewTodoDescription: Option<string> 
+  NewTodoDescription: Option<string>
+  NewTodoDueDate: Option<DateTime>
   Visibility: Visibility
 }
 
