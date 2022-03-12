@@ -1,12 +1,14 @@
 module Todo.View
 
+open System
+open System.Globalization
 open Shared
 open Todo.Types
 open Fable.Core.JsInterop
 open Fable.React
 open Fable.React.Props
 
-let divider =  span [ Style [ MarginLeft 5; MarginRight 5 ] ] [ ]
+let divider =  span [Style [ MarginLeft 5; MarginRight 5 ]]  [ ]
 
 let renderTodo (item: Todo) dispatch =
     let toggleText = if item.Completed then "Actually, Not Yet!" else "Complete"
@@ -18,9 +20,19 @@ let renderTodo (item: Todo) dispatch =
       | true ->  Style [ Color "red"; FontSize 19; Padding 5; TextDecoration "line-through"]
       | false ->  Style [ Color "green"; FontSize 19; Padding 5 ]
 
+    let dateToString (date:DateTime option) =
+        match date with
+        | Some date ->
+            if date.Date = date then date.ToShortDateString()
+            else date.ToString(CultureInfo.InvariantCulture)
+        | None -> ""
+
     div
       [ ]
-      [ p [ todoStyle ] [ str item.Description ]
+      [ p [ todoStyle ]
+          [ yield span [] [ str item.Description ]
+            if item.DueDate.IsSome then
+                yield span [ Style [ FontSize 14; PaddingLeft 5 ] ] [ str (dateToString item.DueDate) ] ]
         button [ ClassName "button is-info"; dispatchToggle ] [ str toggleText ]
         divider
         button [ ClassName "button is-danger"; dispatchDelete ] [ str "Delete" ] ]
