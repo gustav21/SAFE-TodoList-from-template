@@ -8,6 +8,8 @@ open Fable.Core.JsInterop
 open Fable.React
 open Fable.React.Props
 
+importAll "flatpickr/dist/themes/material_green.css"
+
 let divider =  span [Style [ MarginLeft 5; MarginRight 5 ]]  [ ]
 
 let renderTodo (item: Todo) dispatch =
@@ -40,8 +42,25 @@ let renderTodo (item: Todo) dispatch =
 
 let addTodo (state: State) dispatch =
   let textValue = defaultArg state.NewTodoDescription ""
+
+  let dueDatePicker name setMsg clearMsg date options =
+    Flatpickr.flatpickr
+      [ yield! options
+        Flatpickr.ClassName "control flatpickr"
+        FlatpickrExt.Wrap true
+        FlatpickrExt.Value date
+        FlatpickrExt.OnChange (fun date -> setMsg date |> dispatch) (fun () -> dispatch clearMsg)
+        Flatpickr.custom "children" [
+                                      input [ ClassName "input is-large";
+                                              Data ("input","")
+                                              Style [ Width 160 ]
+                                              Placeholder name ]
+                                      button [ ClassName "button is-danger is-light is-large"; Data ("clear","") ] [ i [ ClassName "fas fa-times"; Title "Clear date" ] [] ]
+                                    ] false ]
+
+
   div
-    [ ClassName "field has-addons"; Style [Padding 5; Width 400] ]
+    [ ClassName "field has-addons"; Style [Padding 5] ]
     [ div
         [ ClassName "control is-large" ]
         [ input [ ClassName "input is-large"
@@ -49,6 +68,16 @@ let addTodo (state: State) dispatch =
                   DefaultValue textValue
                   Value textValue
                   OnChange (fun ev -> dispatch (SetNewTextDescription (!!ev.target?value)))] ]
+
+      dueDatePicker "Due date" SetNewDueDate ClearNewDueDate
+          state.NewTodoDueDate
+          []
+
+      dueDatePicker "Due time" SetNewDueTime ClearNewDueTime
+        (state.NewTodoDueDate |> Option.filter (fun date -> date <> date.Date)) // should clear input if empty time
+        [ Flatpickr.HideCalendar true
+          Flatpickr.EnableTimePicker true ]
+
       div
         [ ClassName "control is-large" ]
         [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch AddTodo) ] [ str "Add Todo" ] ] ]

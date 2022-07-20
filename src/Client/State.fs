@@ -20,6 +20,34 @@ let update (msg: Msg) (prevState: State) =
         let nextState = { prevState with NewTodoDescription = Some text }
         nextState, Cmd.none
 
+    | SetNewDueDate date ->
+        let newDate =
+            match prevState.NewTodoDueDate with
+            | Some prevDate -> date + prevDate.TimeOfDay
+            | None -> date
+        let nextState = { prevState with NewTodoDueDate = Some newDate }
+        nextState, Cmd.none
+
+    | SetNewDueTime date ->
+        let newDate =
+            match prevState.NewTodoDueDate with
+            | Some prevDate -> prevDate.Date + date.TimeOfDay
+            | None -> date
+        let nextState = { prevState with NewTodoDueDate = Some newDate }
+        nextState, Cmd.none
+
+    | ClearNewDueDate ->
+        let nextState = { prevState with NewTodoDueDate = None }
+        nextState, Cmd.none
+
+    | ClearNewDueTime ->
+        let newDate =
+            match prevState.NewTodoDueDate with
+            | Some prevDate -> Some prevDate.Date
+            | None -> None
+        let nextState = { prevState with NewTodoDueDate = newDate }
+        nextState, Cmd.none
+
     | LoadTodoItems ->
         prevState, Server.loadAllTodos()
 
@@ -30,7 +58,7 @@ let update (msg: Msg) (prevState: State) =
 
     | TodoAdded todoItem ->
         let nextTodoItems = List.append prevState.TodoItems [todoItem]
-        let nextState = { prevState with TodoItems = nextTodoItems; NewTodoDescription = None }
+        let nextState = { prevState with TodoItems = nextTodoItems; NewTodoDescription = None; NewTodoDueDate = None }
         nextState, Cmd.none
 
     | TodoItemsLoaded items ->

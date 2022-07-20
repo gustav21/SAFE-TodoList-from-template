@@ -20,6 +20,10 @@ type Msg =
   | TodoItemsLoaded of List<Todo>
   | LoadTodoItemsFailure of Exception
   | SetNewTextDescription of string
+  | SetNewDueDate of DateTime
+  | SetNewDueTime of DateTime
+  | ClearNewDueDate
+  | ClearNewDueTime
   | AddTodo
   | AddTodoFailed
   | TodoAdded of Todo
