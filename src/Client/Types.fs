@@ -3,14 +3,15 @@ module Todo.Types
 open Shared
 open System
 
-type Visibility = 
+type Visibility =
   | All
   | Completed
-  | NotCompleted 
+  | NotCompleted
 
 type State = {
   TodoItems: List<Todo>
-  NewTodoDescription: Option<string> 
+  NewTodoDescription: Option<string>
+  NewTodoDueDate: Option<DateTime>
   Visibility: Visibility
 }
 
@@ -19,6 +20,10 @@ type Msg =
   | TodoItemsLoaded of List<Todo>
   | LoadTodoItemsFailure of Exception
   | SetNewTextDescription of string
+  | SetNewDueDate of DateTime
+  | SetNewDueTime of DateTime
+  | ClearNewDueDate
+  | ClearNewDueTime
   | AddTodo
   | AddTodoFailed
   | TodoAdded of Todo

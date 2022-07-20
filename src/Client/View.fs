@@ -1,12 +1,16 @@
 module Todo.View
 
+open System
+open System.Globalization
 open Shared
 open Todo.Types
 open Fable.Core.JsInterop
 open Fable.React
 open Fable.React.Props
 
-let divider =  span [ Style [ MarginLeft 5; MarginRight 5 ] ] [ ]
+importAll "flatpickr/dist/themes/material_green.css"
+
+let divider =  span [Style [ MarginLeft 5; MarginRight 5 ]]  [ ]
 
 let renderTodo (item: Todo) dispatch =
     let toggleText = if item.Completed then "Actually, Not Yet!" else "Complete"
@@ -18,9 +22,19 @@ let renderTodo (item: Todo) dispatch =
       | true ->  Style [ Color "red"; FontSize 19; Padding 5; TextDecoration "line-through"]
       | false ->  Style [ Color "green"; FontSize 19; Padding 5 ]
 
+    let dateToString (date:DateTime option) =
+        match date with
+        | Some date ->
+            if date.Date = date then date.ToShortDateString()
+            else date.ToString(CultureInfo.InvariantCulture)
+        | None -> ""
+
     div
       [ ]
-      [ p [ todoStyle ] [ str item.Description ]
+      [ p [ todoStyle ]
+          [ yield span [] [ str item.Description ]
+            if item.DueDate.IsSome then
+                yield span [ Style [ FontSize 14; PaddingLeft 5 ] ] [ str (dateToString item.DueDate) ] ]
         button [ ClassName "button is-info"; dispatchToggle ] [ str toggleText ]
         divider
         button [ ClassName "button is-danger"; dispatchDelete ] [ str "Delete" ] ]
@@ -28,8 +42,25 @@ let renderTodo (item: Todo) dispatch =
 
 let addTodo (state: State) dispatch =
   let textValue = defaultArg state.NewTodoDescription ""
+
+  let dueDatePicker name setMsg clearMsg date options =
+    Flatpickr.flatpickr
+      [ yield! options
+        Flatpickr.ClassName "control flatpickr"
+        FlatpickrExt.Wrap true
+        FlatpickrExt.Value date
+        FlatpickrExt.OnChange (fun date -> setMsg date |> dispatch) (fun () -> dispatch clearMsg)
+        Flatpickr.custom "children" [
+                                      input [ ClassName "input is-large";
+                                              Data ("input","")
+                                              Style [ Width 160 ]
+                                              Placeholder name ]
+                                      button [ ClassName "button is-danger is-light is-large"; Data ("clear","") ] [ i [ ClassName "fas fa-times"; Title "Clear date" ] [] ]
+                                    ] false ]
+
+
   div
-    [ ClassName "field has-addons"; Style [Padding 5; Width 400] ]
+    [ ClassName "field has-addons"; Style [Padding 5] ]
     [ div
         [ ClassName "control is-large" ]
         [ input [ ClassName "input is-large"
@@ -37,6 +68,16 @@ let addTodo (state: State) dispatch =
                   DefaultValue textValue
                   Value textValue
                   OnChange (fun ev -> dispatch (SetNewTextDescription (!!ev.target?value)))] ]
+
+      dueDatePicker "Due date" SetNewDueDate ClearNewDueDate
+          state.NewTodoDueDate
+          []
+
+      dueDatePicker "Due time" SetNewDueTime ClearNewDueTime
+        (state.NewTodoDueDate |> Option.filter (fun date -> date <> date.Date)) // should clear input if empty time
+        [ Flatpickr.HideCalendar true
+          Flatpickr.EnableTimePicker true ]
+
       div
         [ ClassName "control is-large" ]
         [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch AddTodo) ] [ str "Add Todo" ] ] ]
