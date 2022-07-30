@@ -14,7 +14,9 @@ let OnChange (onSelect: DateTime -> unit) (onClear: unit -> unit) =
         unbox (fun (dates: DateTime[]) ->
             if isNull (unbox<obj> dates) || Array.isEmpty dates
             then onClear()
-            else onSelect dates.[0])
+            else
+                let date = DateTime.SpecifyKind(dates.[0],DateTimeKind.Local)
+                onSelect date)
     Flatpickr.custom "onChange" callback false
 
 /// Sets the initial value for the Flatpickr component (value is optional)
